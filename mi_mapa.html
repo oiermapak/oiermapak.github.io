@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+	<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css"  type=text/css>
+	<style>
+		.mibloque{
+			width: 800px;
+			height: 600px;
+			box-shadow: 20px 20px 20px Rgb(53, 115, 160);
+		}
+
+		.ol-mouse-position {
+           font-size:20px;
+           font-family: Arial black;
+           top:5px;
+           right:5px;
+           position:absolute;
+           color:Rgb(243, 17, 6);
+           }
+	</style>
+	<title></title>
+</head>
+<body>
+	<h1>Mi mapa</h1>
+	<div id= 'mibloquemapa' class="mibloque"></div>
+      <script type="text/javascript">
+
+var CapaBase= new ol.layer.Tile ({ title: 'Capa base OSM', type:'base', visible:true, source: new ol.source.OSM()});
+var lavista=new ol.View({ center: ol.proj.fromLonLat([-0.808804, 37.8141666667]), zoom:14});
+
+var controles= ol.control.defaults().extend([
+ new ol.control.ZoomSlider(),
+ new ol.control.ScaleLine(),
+ new ol.control.ZoomToExtent (),
+ new ol.control.MousePosition({projection: 'EPSG:4326', coordinateFormat: function(coordinate) { return ol.coordinate.format(coordinate, '{y}, {x}', 6); }
+ }), ]);
+
+
+var fuente1 = new ol.source.Vector ({format: new ol.format.GeoJSON(), url:'http://localhost:8080/geoserver/www/Parcelas_de_catastro.geojson'});
+var fuente2 = new ol.source.Vector ({format: new ol.format.GeoJSON(), url:'http://localhost:8080/geoserver/www/Limite_costas.geojson'});
+
+
+
+
+
+
+var estilonuevo_lineas2 = [ new ol.style.Style({
+stroke: new ol.style.Stroke({
+color: 'red',
+width: 4
+}),
+})];
+
+
+
+var EstiloSuperficies = function(feature) { // cuando queremos leer toda la base de datos gráfica function (feature)
+return [new ol.style.Style({
+fill: new ol.style.Fill({
+color: 'orange',
+}),
+})];
+};
+
+var capa_superficial= new ol.layer.Vector ({
+title:'Partzelak',
+source: fuente1,
+projection: 'EPSG:4326',
+style:EstiloSuperficies,
+opacity: 0.48,
+}); // Creamos una capa_superficial solo nos interesa el polígono
+var capa_lineal1= new ol.layer.Vector ({
+title:'Limitia',
+source: fuente2,
+projection: 'EPSG:4326',
+style:estilonuevo_lineas2,
+}); // Creamos una capa_lineal
+
+
+
+
+var mimapa = new ol.Map ({
+    target: 'mibloquemapa',
+    layers: [CapaBase,capa_superficial,capa_lineal1],
+    view: lavista,
+    controls: controles,
+
+});
+</script>
+</body>
+</html>
